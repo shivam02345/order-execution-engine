@@ -299,8 +299,13 @@ Redis + PostgreSQL can be hosted using:
 - PostgreSQL: Supabase / NeonDB (free)  
 
 ---
+# 🎥 **Demo Video (Required by PDF)**
+
+🎬 **YouTube Link:**  
+[https://youtu.be/<your-video-id>](https://youtu.be/k-3THCyvJGE)
 
 Video shows:
+
 
 - 3–5 simultaneous orders  
 - WebSocket updates  
@@ -335,4 +340,5 @@ This project fulfills **100% of the Task 2 requirements**:
 - Unit tests + Postman collection  
 - Deployment-ready  
 - Clean, modular, documented 
+
 
