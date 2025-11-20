@@ -285,20 +285,6 @@ This includes:
 - 3 simultaneous order testing  
 
 ---
-
-# 🌍 **Deployment (Required by PDF)**
-
-Deployed URL:  
-**https://<your-deployed-url>**
-
-(You can deploy the Fastify backend to Render, Railway, Fly.io, or AWS Lightsail.)
-
-Redis + PostgreSQL can be hosted using:
-
-- Redis: Upstash (free)  
-- PostgreSQL: Supabase / NeonDB (free)  
-
----
 # 🎥 **Demo Video (Required by PDF)**
 
 🎬 **YouTube Link:**  
@@ -340,5 +326,6 @@ This project fulfills **100% of the Task 2 requirements**:
 - Unit tests + Postman collection  
 - Deployment-ready  
 - Clean, modular, documented 
+
 
 
