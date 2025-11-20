@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order WebSocket Panel</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+            color: #7bd7ff;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        input {
+            width: 100%;
+            margin-top: 6px;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+        }
+        
+        .primary {
+            background: #00b894;
+            color: white;
+        }
+        
+        .primary:hover {
+            background: #019170;
+        }
+        
+        .secondary {
+            background: #0984e3;
+            color: white;
+        }
+        
+        .secondary:hover {
+            background: #0a6fc2;
+        }
+        
+        #log {
+            height: 250px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Order WebSocket Panel</h1>
+
+        <div class="section">
+            <label>Order ID</label>
+            <input id="orderId" readonly />
+            <button id="connectBtn" class="secondary">Connect with Existing ID</button>
+        </div>
+
+        <div class="section">
+            <button id="createAndListenBtn" class="primary">Create Order & Listen</button>
+        </div>
+
+        <div class="section">
+            <h3 style="margin-top:0;color:#7bd7ff;">Logs</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        const orderInput = document.getElementById('orderId');
+        const logEl = document.getElementById('log');
+        const connectBtn = document.getElementById('connectBtn');
+        const createAndListenBtn = document.getElementById('createAndListenBtn');
+
+        function log(msg) {
+            logEl.textContent += msg + "";
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function connectWebSocket(orderId) {
+            const wsUrl = `ws://localhost:3000/ws/orders/${orderId}`;
+            log(`Connecting to ${wsUrl} ...`);
+
+            const ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => log('✅ WebSocket connected');
+            ws.onmessage = (event) => log('📩 ' + event.data);
+            ws.onerror = () => log('❌ WebSocket error');
+            ws.onclose = () => log('🔌 WebSocket closed');
+        }
+
+        connectBtn.onclick = () => {
+            const orderId = orderInput.value.trim();
+            if (!orderId) return alert('No orderId set yet');
+            connectWebSocket(orderId);
+        };
+
+        createAndListenBtn.onclick = async() => {
+            log('Creating new order via HTTP ...');
+            try {
+                const res = await fetch('http://localhost:3000/api/orders/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tokenIn: 'SOL',
+                        tokenOut: 'USDC',
+                        amount: 1.5,
+                        side: 'buy'
+                    })
+                });
+
+                const data = await res.json();
+                log('Created order: ' + JSON.stringify(data));
+
+                const orderId = data.orderId;
+                orderInput.value = orderId;
+                connectWebSocket(orderId);
+            } catch (err) {
+                console.error(err);
+                log('❌ Failed to create order');
+            }
+        };
+    </script>
+</body>
+
+</html>
